@@ -2,6 +2,7 @@
 const nextConfig = {
   transpilePackages: ['three'],
   output: 'export',
+  basePath: '/tnp',
   images: {
     unoptimized: true,
   },
