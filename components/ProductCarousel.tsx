@@ -24,10 +24,40 @@ export default function ProductCarousel() {
   const [isAutoRotating, setIsAutoRotating] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<Product[]>([]);
+  const [customerInfo, setCustomerInfo] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: ''
+  });
   const dragStartX = useRef(0);
 
   const handleAddToCart = () => {
+    const currentProduct = products[currentIndex];
+    setCartItems(prev => [...prev, currentProduct]);
     setCartCount(prev => prev + 1);
+  };
+
+  const handleRemoveFromCart = (indexToRemove: number) => {
+    setCartItems(prev => prev.filter((_, idx) => idx !== indexToRemove));
+    setCartCount(prev => prev - 1);
+  };
+
+  const calculateDiscount = (itemCount: number) => {
+    if (itemCount >= 3) return 15;
+    if (itemCount >= 2) return 10;
+    return 0;
+  };
+
+  const calculateTotal = () => {
+    const subtotal = cartItems.reduce((sum, item) => sum + (item.price || 0), 0);
+    const deliveryCharge = 75;
+    const discountPercent = calculateDiscount(cartItems.length);
+    const discount = (subtotal * discountPercent) / 100;
+    const total = subtotal + deliveryCharge - discount;
+    return { subtotal, deliveryCharge, discount, discountPercent, total };
   };
 
   const openImageModal = (product: Product, imageIndex: number = 0) => {
@@ -144,14 +174,17 @@ export default function ProductCarousel() {
     <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
       {/* Top Text */}
       <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20">
-        <h1 className="text-2xl font-bold text-white tracking-wide drop-shadow-lg">
+        <h1 className="text-3xl font-bold text-white tracking-wide drop-shadow-lg">
           The Noble Presents
         </h1>
       </div>
 
       {/* Cart Icon */}
       <div className="absolute top-8 right-8 z-20">
-        <button className="relative p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all border border-[#D1D5DB]">
+        <button 
+          onClick={() => setIsCartOpen(true)}
+          className="relative p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all border border-[#D1D5DB]"
+        >
           <svg className="w-6 h-6 text-[#1C1E21]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
@@ -233,16 +266,16 @@ export default function ProductCarousel() {
                   transformStyle: 'preserve-3d',
                   left: '50%',
                   top: '50%',
-                  marginLeft: '-350px',
-                  marginTop: '-200px',
+                  marginLeft: '-385px',
+                  marginTop: '-220px',
                   zIndex: position === 0 ? 10 : Math.max(0, 5 - absDiff),
                   pointerEvents: absDiff > 1 ? 'none' : 'auto'
                 }}
               >
-                <div className="w-[700px] h-[400px] rounded-2xl bg-white/70 backdrop-blur-md border border-[#D1D5DB] p-8 flex flex-row items-center gap-10 shadow-2xl">
+                <div className="w-[770px] h-[440px] rounded-2xl bg-white/70 backdrop-blur-md border border-[#D1D5DB] p-8 flex flex-col items-center gap-4 shadow-2xl relative">
                   {/* Product Image/Icon */}
                   <div 
-                    className="flex-shrink-0 w-[240px] h-[240px] flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+                    className="flex-shrink-0 w-[320px] h-[200px] flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={(e) => {
                       e.stopPropagation();
                       openImageModal(product, 0);
@@ -264,42 +297,42 @@ export default function ProductCarousel() {
                   </div>
                   
                   {/* Product Info */}
-                  <div className="flex flex-col gap-3 flex-1">
+                  <div className="flex flex-col gap-2 w-full">
                     {/* Product Title */}
-                    <h3 className="text-2xl font-bold text-[#1C1E21]">
+                    <h3 className="text-xl font-bold text-[#1C1E21] text-center">
                       {product.title}
                     </h3>
                     
                     {/* Product Description */}
-                    <p className="text-[#1C1E21] text-sm leading-relaxed">
+                    <p className="text-black text-sm leading-relaxed font-semibold max-w-[500px] mx-auto text-center">
                       {product.description}
                     </p>
                     
                     {/* Price and Weight */}
                     {(product.price || product.weight) && (
-                      <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center justify-center gap-4 text-base">
                         {product.price && (
-                          <span className="font-bold text-[#1C1E21] text-lg">₹{product.price}</span>
+                          <span className="font-bold text-[#1C1E21] text-xl">₹{product.price}</span>
                         )}
                         {product.weight && (
-                          <span className="text-[#1C1E21]">Weight: {product.weight}</span>
+                          <span className="text-black font-semibold">Weight: {product.weight}</span>
                         )}
                       </div>
                     )}
-                    
-                    {/* Add to Cart Button (only on center item) */}
-                    {index === currentIndex && (
-                      <motion.button
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        onClick={handleAddToCart}
-                        className="mt-2 px-6 py-3 bg-[#1C1E21] text-white text-sm font-medium rounded-lg hover:bg-black transition-all shadow-md hover:shadow-lg self-start"
-                      >
-                        Add to Cart
-                      </motion.button>
-                    )}
                   </div>
+                  
+                  {/* Add to Cart Button (only on center item) - Bottom Right */}
+                  {index === currentIndex && (
+                    <motion.button
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      onClick={handleAddToCart}
+                      className="absolute bottom-4 right-4 px-6 py-3 bg-[#1C1E21] text-white text-sm font-medium rounded-lg hover:bg-black transition-all shadow-md hover:shadow-lg"
+                    >
+                      Add to Cart
+                    </motion.button>
+                  )}
                 </div>
               </motion.div>
             );
@@ -425,6 +458,144 @@ export default function ProductCarousel() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Cart Sidebar */}
+      {isCartOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setIsCartOpen(false)}
+          />
+          
+          {/* Sidebar */}
+          <div className="fixed right-0 top-0 h-full w-[450px] bg-white/50 backdrop-blur-md shadow-2xl z-50 overflow-y-auto overflow-x-hidden">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-[#1C1E21]">Cart {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}</h2>
+                <button 
+                  onClick={() => setIsCartOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Cart Items */}
+              <div className="mb-6">
+                {cartItems.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Your cart is empty</p>
+                ) : (
+                  <div className="space-y-3">
+                    {cartItems.map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-3 bg-white/50 rounded-lg relative">
+                        <div className="w-16 h-16 flex-shrink-0">
+                          {item.images && item.images[0] && (item.images[0].startsWith('/') || item.images[0].startsWith('http')) ? (
+                            <img src={item.images[0]} alt={item.title} className="w-full h-full object-contain" />
+                          ) : (
+                            <span className="text-2xl">{item.images?.[0] || '📦'}</span>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm text-[#1C1E21]">{item.title}</h4>
+                        </div>
+                        <span className="font-bold text-[#1C1E21]">₹{item.price}</span>
+                        <button
+                          onClick={() => handleRemoveFromCart(idx)}
+                          className="ml-2 p-1 hover:bg-red-100 rounded-full transition-colors"
+                          title="Remove item"
+                        >
+                          <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Price Breakdown */}
+              {cartItems.length > 0 && (
+                <>
+                  <div className="border-t border-gray-300 pt-4 mb-6">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-[#1C1E21] font-medium">Subtotal</span>
+                        <span className="font-semibold">₹{calculateTotal().subtotal}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[#1C1E21] font-medium">Delivery Charge</span>
+                        <span className="font-semibold">₹{calculateTotal().deliveryCharge}</span>
+                      </div>
+                      {calculateTotal().discountPercent > 0 && (
+                        <div className="flex justify-between text-green-800">
+                          <span className="font-bold">Discount ({calculateTotal().discountPercent}%)</span>
+                          <span className="font-bold">-₹{calculateTotal().discount}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between text-lg font-bold text-[#1C1E21] pt-2 border-t">
+                        <span>Total</span>
+                        <span>₹{calculateTotal().total}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Customer Info Form */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-[#1C1E21] mb-3">Customer Details</h3>
+                    <div className="space-y-3">
+                      {/* Name and Phone on same line */}
+                      <div className="flex gap-3 w-full">
+                        <input
+                          type="text"
+                          placeholder="Full Name"
+                          value={customerInfo.name}
+                          onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
+                          className="flex-1 min-w-0 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 text-[#1C1E21] placeholder:text-gray-500 font-medium"
+                        />
+                        <input
+                          type="tel"
+                          placeholder="Phone"
+                          value={customerInfo.phone}
+                          onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
+                          className="flex-1 min-w-0 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 text-[#1C1E21] placeholder:text-gray-500 font-medium"
+                        />
+                      </div>
+                      <input
+                        type="email"
+                        placeholder="Email Address"
+                        value={customerInfo.email}
+                        onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 text-[#1C1E21] placeholder:text-gray-500 font-medium"
+                      />
+                      <textarea
+                        placeholder="Delivery Address"
+                        value={customerInfo.address}
+                        onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
+                        rows={3}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 resize-none text-[#1C1E21] placeholder:text-gray-500 font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Payment Button */}
+                  <button 
+                    onClick={() => alert('Payment processing...')}
+                    disabled={!customerInfo.name || !customerInfo.email || !customerInfo.phone || !customerInfo.address}
+                    className="w-full py-3 bg-[#1C1E21] text-white font-semibold rounded-lg hover:bg-black transition-all shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
+                  >
+                    Proceed to Payment
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
