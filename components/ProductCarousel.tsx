@@ -34,9 +34,13 @@ export default function ProductCarousel() {
     name: '',
     email: '',
     phone: '+91 ',
-    address: ''
+    address: '',
+    pincode: ''
   });
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
+  const [pincodeError, setPincodeError] = useState('');
   const dragStartX = useRef(0);
 
   const handleAddToCart = () => {
@@ -54,9 +58,9 @@ export default function ProductCarousel() {
     }
     setCartCount(prev => prev + 1);
     
-    // Visual feedback
+    // Visual feedback - show "Added" for 3 seconds
     setIsAddingToCart(true);
-    setTimeout(() => setIsAddingToCart(false), 300);
+    setTimeout(() => setIsAddingToCart(false), 3000);
   };
 
   const handleRemoveFromCart = (indexToRemove: number) => {
@@ -251,7 +255,7 @@ export default function ProductCarousel() {
             <div className="relative overflow-hidden bg-gradient-to-br from-green-400 to-emerald-500 rounded p-1.5 sm:p-2 md:p-3 shadow-sm md:shadow-md transform hover:scale-105 transition-all duration-200">
               <div className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 bg-white/20 rounded-full -mr-3 -mt-3 sm:-mr-4 sm:-mt-4 md:-mr-6 md:-mt-6"></div>
               <div className="relative z-10">
-                <p className="text-[7px] sm:text-[8px] md:text-[10px] font-bold text-white/90 uppercase tracking-wide leading-tight">Buy 2 Items</p>
+                <p className="text-[8px] sm:text-[10px] md:text-xs font-bold text-white/90 uppercase tracking-wide leading-tight">Buy 2 Items</p>
                 <div className="flex items-baseline gap-0.5">
                   <p className="text-sm sm:text-lg md:text-2xl font-black text-white">10%</p>
                   <p className="text-[8px] sm:text-[9px] md:text-xs font-bold text-white/90">OFF</p>
@@ -264,7 +268,7 @@ export default function ProductCarousel() {
             <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 rounded p-1.5 sm:p-2 md:p-3 shadow-sm md:shadow-md transform hover:scale-105 transition-all duration-200">
               <div className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 bg-white/20 rounded-full -mr-3 -mt-3 sm:-mr-4 sm:-mt-4 md:-mr-6 md:-mt-6"></div>
               <div className="relative z-10">
-                <p className="text-[7px] sm:text-[8px] md:text-[10px] font-bold text-white/90 uppercase tracking-wide leading-tight">Buy 3+ Items</p>
+                <p className="text-[8px] sm:text-[10px] md:text-xs font-bold text-white/90 uppercase tracking-wide leading-tight">Buy 3+ Items</p>
                 <div className="flex items-baseline gap-0.5">
                   <p className="text-sm sm:text-lg md:text-2xl font-black text-white">15%</p>
                   <p className="text-[8px] sm:text-[9px] md:text-xs font-bold text-white/90">OFF</p>
@@ -365,10 +369,10 @@ export default function ProductCarousel() {
                   pointerEvents: absDiff > 1 ? 'none' : 'auto'
                 }}
               >
-                <div className="w-[300px] h-[400px] sm:w-[500px] sm:h-[420px] md:w-[770px] md:h-[440px] rounded-2xl bg-white/70 backdrop-blur-md border border-[#D1D5DB] p-4 sm:p-6 md:p-8 flex flex-col items-center gap-2 sm:gap-3 md:gap-4 shadow-2xl relative">
-                  {/* Product Image/Icon */}
+                <div className="w-[300px] h-[440px] sm:w-[500px] sm:h-[462px] md:w-[770px] md:h-[484px] rounded-2xl bg-white/70 backdrop-blur-md border border-[#D1D5DB] p-4 sm:p-6 md:p-8 flex flex-col md:flex-row gap-4 sm:gap-6 shadow-2xl relative">
+                  {/* Left Side - Product Image */}
                   <div 
-                    className="flex-shrink-0 w-[150px] h-[100px] sm:w-[250px] sm:h-[150px] md:w-[320px] md:h-[200px] flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+                    className="flex-shrink-0 w-full md:w-[320px] h-[180px] sm:h-[200px] md:h-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity bg-white/50 rounded-xl overflow-hidden"
                     onClick={(e) => {
                       e.stopPropagation();
                       openImageModal(product, 0);
@@ -379,7 +383,7 @@ export default function ProductCarousel() {
                         <img 
                           src={product.images[0]} 
                           alt={product.title}
-                          className="max-w-full max-h-full object-contain"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
                         <span className="text-9xl">{product.images[0]}</span>
@@ -389,32 +393,65 @@ export default function ProductCarousel() {
                     )}
                   </div>
                   
-                  {/* Product Info */}
-                  <div className="flex flex-col gap-2 w-full">
+                  {/* Right Side - Product Info */}
+                  <div className="flex flex-col justify-between flex-1 gap-3">
                     {/* Product Title */}
-                    <h3 className="text-base sm:text-lg md:text-xl font-bold text-[#1C1E21] text-center">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#1C1E21]">
                       {product.title}
                     </h3>
                     
                     {/* Product Description */}
-                    <p className="text-black text-xs sm:text-sm leading-relaxed font-semibold max-w-[250px] sm:max-w-[400px] md:max-w-[500px] mx-auto text-center line-clamp-3">
+                    <p className="text-gray-900 text-xs sm:text-sm md:text-base leading-relaxed font-medium flex-1 overflow-y-auto">
                       {product.description}
                     </p>
                     
                     {/* Price, Weight, and Dimensions */}
-                    {(product.price || product.weight || product.dimensions) && (
-                      <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm md:text-base">
-                        {product.price && (
-                          <span className="font-bold text-[#1C1E21] text-lg sm:text-xl">₹{product.price}</span>
-                        )}
-                        {product.weight && (
-                          <span className="text-black font-semibold">Weight: {product.weight}</span>
-                        )}
-                        {product.dimensions && (
-                          <span className="text-black font-semibold">Size: {product.dimensions}</span>
-                        )}
-                      </div>
-                    )}
+                    <div className="space-y-2">
+                      {product.price && (
+                        <div className="text-2xl sm:text-3xl font-bold text-[#1C1E21]">₹{product.price}</div>
+                      )}
+                      {(product.weight || product.dimensions) && (
+                        <div className="flex flex-wrap gap-3 text-xs sm:text-sm text-gray-600">
+                          {product.weight && (
+                            <span className="flex items-center gap-1">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                              </svg>
+                              {product.weight}
+                            </span>
+                          )}
+                          {product.dimensions && (
+                            <span className="flex items-center gap-1">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                              </svg>
+                              {product.dimensions}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Dots Indicator - Only show on center card */}
+                      {index === currentIndex && (
+                        <div className="flex gap-2 mt-3">
+                          {products.map((_, dotIndex) => (
+                            <button
+                              key={dotIndex}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentIndex(dotIndex);
+                                setIsAutoRotating(false);
+                              }}
+                              className={`w-2 h-2 rounded-full transition-all ${
+                                dotIndex === currentIndex 
+                                  ? 'bg-[#1C1E21] w-8' 
+                                  : 'bg-[#D1D5DB] hover:bg-[#5F6368]'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   
                   {/* Add to Cart Button (only on center item) - Bottom Right */}
@@ -458,23 +495,6 @@ export default function ProductCarousel() {
           </svg>
         </button>
         
-        {/* Dots Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-          {products.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setCurrentIndex(index);
-                setIsAutoRotating(false); // Stop auto-rotation on dot click
-              }}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentIndex 
-                  ? 'bg-[#1C1E21] w-8' 
-                  : 'bg-[#D1D5DB] hover:bg-[#5F6368]'
-              }`}
-            />
-          ))}
-        </div>
       </div>
 
       {/* Image Modal */}
@@ -585,6 +605,21 @@ export default function ProductCarousel() {
                 </button>
               </div>
 
+              {/* Thank You Message */}
+              {showThankYou && (
+                <div className="mb-6 p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-400 shadow-lg animate-pulse">
+                  <div className="text-center space-y-3">
+                    <div className="text-4xl">🎉</div>
+                    <h3 className="text-xl font-bold text-green-800">Thank You!</h3>
+                    <p className="text-sm text-green-700 leading-relaxed">
+                      Your order has been sent successfully! We truly appreciate your support for our small business. 
+                      We'll get back to you shortly on WhatsApp.
+                    </p>
+                    <div className="text-2xl">💚</div>
+                  </div>
+                </div>
+              )}
+
               {/* Cart Items */}
               <div className="mb-4 sm:mb-6">
                 {cartItems.length === 0 ? (
@@ -677,24 +712,49 @@ export default function ProductCarousel() {
                           maxLength={50}
                           className="flex-1 min-w-0 px-3 py-2 sm:px-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 text-[#1C1E21] placeholder:text-gray-500 font-medium"
                         />
-                        <input
-                          type="tel"
-                          placeholder="Phone *"
-                          value={customerInfo.phone}
-                          onChange={(e) => {
-                            let value = e.target.value;
-                            // Ensure +91 space prefix
-                            if (!value.startsWith('+91 ')) {
-                              value = '+91 ';
-                            }
-                            // Only allow numbers after +91 space
-                            const numbers = value.slice(4).replace(/\D/g, '').slice(0, 10);
-                            setCustomerInfo({...customerInfo, phone: '+91 ' + numbers});
-                          }}
-                          required
-                          pattern="\+91 [0-9]{10}"
-                          className="flex-1 min-w-0 px-3 py-2 sm:px-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 text-[#1C1E21] placeholder:text-gray-500 font-medium"
-                        />
+                        <div className="flex-1 min-w-0 relative group">
+                          <input
+                            type="tel"
+                            placeholder="Phone *"
+                            value={customerInfo.phone}
+                            onChange={(e) => {
+                              let value = e.target.value;
+                              // Ensure +91 space prefix
+                              if (!value.startsWith('+91 ')) {
+                                value = '+91 ';
+                              }
+                              // Only allow numbers after +91 space
+                              let numbers = value.slice(4).replace(/\D/g, '').slice(0, 10);
+                              
+                              // Prevent starting with 0-5
+                              if (numbers.length > 0) {
+                                const firstDigit = numbers[0];
+                                if (['0', '1', '2', '3', '4', '5'].includes(firstDigit)) {
+                                  // Don't allow this input
+                                  setPhoneError('Phone number must start with 6, 7, 8, or 9');
+                                  return;
+                                }
+                              }
+                              
+                              setCustomerInfo({...customerInfo, phone: '+91 ' + numbers});
+                              
+                              // Validate phone number length
+                              if (numbers.length > 0 && numbers.length < 10) {
+                                setPhoneError('Phone number must be 10 digits');
+                              } else {
+                                setPhoneError('');
+                              }
+                            }}
+                            required
+                            pattern="\+91 [6-9][0-9]{9}"
+                            className={`w-full px-3 py-2 sm:px-4 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 text-[#1C1E21] placeholder:text-gray-500 font-medium ${phoneError ? 'border-red-500' : 'border-gray-300'}`}
+                          />
+                          {phoneError && (
+                            <div className="absolute left-0 top-full mt-1 bg-red-600 text-white text-xs px-3 py-1.5 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 max-w-xs">
+                              {phoneError}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <input
                         type="email"
@@ -719,6 +779,33 @@ export default function ProductCarousel() {
                         rows={3}
                         className="w-full px-3 py-2 sm:px-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 resize-none text-[#1C1E21] placeholder:text-gray-500 font-medium"
                       />
+                      <div className="relative group">
+                        <input
+                          type="text"
+                          placeholder="Pincode *"
+                          value={customerInfo.pincode}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                            setCustomerInfo({...customerInfo, pincode: value});
+                            
+                            // Validate pincode
+                            if (value.length > 0 && value.length < 6) {
+                              setPincodeError('Pincode must be 6 digits');
+                            } else {
+                              setPincodeError('');
+                            }
+                          }}
+                          required
+                          pattern="[0-9]{6}"
+                          maxLength={6}
+                          className={`w-full px-3 py-2 sm:px-4 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 text-[#1C1E21] placeholder:text-gray-500 font-medium ${pincodeError ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                        {pincodeError && (
+                          <div className="absolute left-0 top-full mt-1 bg-red-600 text-white text-xs px-3 py-1.5 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 max-w-xs">
+                            {pincodeError}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -735,7 +822,8 @@ export default function ProductCarousel() {
                         `Name: ${customerInfo.name}%0A` +
                         `Phone: ${customerInfo.phone}%0A` +
                         `Email: ${customerInfo.email}%0A` +
-                        `Address: ${customerInfo.address}%0A%0A` +
+                        `Address: ${customerInfo.address}%0A` +
+                        `Pincode: ${customerInfo.pincode}%0A%0A` +
                         `*Order Items:*%0A${itemsList}%0A%0A` +
                         `*Order Summary:*%0A` +
                         `Subtotal: ₹${total.subtotal}%0A` +
@@ -745,8 +833,28 @@ export default function ProductCarousel() {
                       
                       // Send order to WhatsApp business number with pre-filled message
                       window.open(`https://wa.me/${siteConfig.whatsapp.number}?text=${message}`, '_blank');
+                      
+                      // Show thank you message
+                      setShowThankYou(true);
+                      
+                      // Clear cart and reset form after 5 seconds
+                      setTimeout(() => {
+                        setShowThankYou(false);
+                        setCartItems([]);
+                        setCartCount(0);
+                        setCustomerInfo({
+                          name: '',
+                          email: '',
+                          phone: '+91 ',
+                          address: '',
+                          pincode: ''
+                        });
+                        setPhoneError('');
+                        setPincodeError('');
+                        setIsCartOpen(false);
+                      }, 5000);
                     }}
-                    disabled={!customerInfo.name || customerInfo.phone.length !== 14 || !customerInfo.address}
+                    disabled={!customerInfo.name || customerInfo.phone.length !== 14 || phoneError !== '' || !customerInfo.address || customerInfo.pincode.length !== 6 || pincodeError !== ''}
                     className="w-full py-2.5 sm:py-3 bg-green-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-green-700 transition-all shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400 flex items-center justify-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
