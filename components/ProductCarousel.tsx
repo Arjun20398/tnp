@@ -12,6 +12,7 @@ interface Product {
   images: string[]; // Changed from image to images array
   price?: number;
   weight?: string;
+  dimensions?: string;
 }
 
 const products: Product[] = productsData;
@@ -25,36 +26,74 @@ export default function ProductCarousel() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<Product[]>([]);
+  const [cartItems, setCartItems] = useState<Array<Product & { quantity: number }>>([]);
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     email: '',
-    phone: '',
+    phone: '+91 ',
     address: ''
   });
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const dragStartX = useRef(0);
 
   const handleAddToCart = () => {
     const currentProduct = products[currentIndex];
-    setCartItems(prev => [...prev, currentProduct]);
+    const existingItemIndex = cartItems.findIndex(item => item.id === currentProduct.id);
+    
+    if (existingItemIndex >= 0) {
+      // Item exists, increase quantity
+      setCartItems(prev => prev.map((item, idx) => 
+        idx === existingItemIndex ? { ...item, quantity: item.quantity + 1 } : item
+      ));
+    } else {
+      // New item, add with quantity 1
+      setCartItems(prev => [...prev, { ...currentProduct, quantity: 1 }]);
+    }
     setCartCount(prev => prev + 1);
+    
+    // Visual feedback
+    setIsAddingToCart(true);
+    setTimeout(() => setIsAddingToCart(false), 300);
   };
 
   const handleRemoveFromCart = (indexToRemove: number) => {
+    const item = cartItems[indexToRemove];
     setCartItems(prev => prev.filter((_, idx) => idx !== indexToRemove));
-    setCartCount(prev => prev - 1);
+    setCartCount(prev => prev - item.quantity);
+  };
+
+  const handleIncreaseQuantity = (index: number) => {
+    setCartItems(prev => prev.map((item, idx) => 
+      idx === index ? { ...item, quantity: item.quantity + 1 } : item
+    ));
+    setCartCount(prev => prev + 1);
+  };
+
+  const handleDecreaseQuantity = (index: number) => {
+    const item = cartItems[index];
+    if (item.quantity > 1) {
+      setCartItems(prev => prev.map((item, idx) => 
+        idx === index ? { ...item, quantity: item.quantity - 1 } : item
+      ));
+      setCartCount(prev => prev - 1);
+    } else {
+      handleRemoveFromCart(index);
+    }
   };
 
   const calculateDiscount = (itemCount: number) => {
-    if (itemCount >= 3) return 15;
-    if (itemCount >= 2) return 10;
+    // Calculate based on total quantity, not unique items
+    const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    if (totalQuantity >= 3) return 15;
+    if (totalQuantity >= 2) return 10;
     return 0;
   };
 
   const calculateTotal = () => {
-    const subtotal = cartItems.reduce((sum, item) => sum + (item.price || 0), 0);
+    const subtotal = cartItems.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
     const deliveryCharge = 75;
-    const discountPercent = calculateDiscount(cartItems.length);
+    const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const discountPercent = calculateDiscount(totalQuantity);
     const discount = (subtotal * discountPercent) / 100;
     const total = subtotal + deliveryCharge - discount;
     return { subtotal, deliveryCharge, discount, discountPercent, total };
@@ -196,6 +235,42 @@ export default function ProductCarousel() {
         </button>
       </div>
 
+      {/* Promotional Banner - Top Left Corner */}
+      <div className="absolute left-8 top-8 z-20 animate-pulse-slow">
+        <div className="rounded-xl p-4 max-w-[200px] hover:scale-105 transition-transform duration-300">
+          <div className="space-y-2.5">
+            {/* 10% OFF Card */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg p-3 shadow-lg transform hover:scale-105 transition-all duration-200">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-white/20 rounded-full -mr-8 -mt-8"></div>
+              <div className="relative z-10">
+                <p className="text-[10px] font-bold text-white/90 uppercase tracking-wider mb-0.5">Buy 2 Items</p>
+                <div className="flex items-baseline gap-1">
+                  <p className="text-2xl font-black text-white">10%</p>
+                  <p className="text-xs font-bold text-white/90">OFF</p>
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+            </div>
+            
+            {/* 15% OFF Card */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg p-3 shadow-lg transform hover:scale-105 transition-all duration-200">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-white/20 rounded-full -mr-8 -mt-8"></div>
+              <div className="relative z-10">
+                <p className="text-[10px] font-bold text-white/90 uppercase tracking-wider mb-0.5">Buy 3+ Items</p>
+                <div className="flex items-baseline gap-1">
+                  <p className="text-2xl font-black text-white">15%</p>
+                  <p className="text-xs font-bold text-white/90">OFF</p>
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+            </div>
+          </div>
+          
+          {/* Sparkle decoration */}
+          <div className="absolute -top-1 -right-1 text-yellow-400 text-xl animate-pulse">✨</div>
+        </div>
+      </div>
+
       {/* Social Media Icons - Bottom */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-6">
         {/* Instagram */}
@@ -205,6 +280,16 @@ export default function ProductCarousel() {
           </svg>
           <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#1C1E21] text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
             Follow us on Insta
+          </span>
+        </a>
+
+        {/* Google Business */}
+        <a href="https://share.google/UuHpcnCeyLHJ99A8C" target="_blank" rel="noopener noreferrer" className="p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all border border-[#D1D5DB] hover:bg-gray-50 group relative">
+          <svg className="w-6 h-6 text-[#1C1E21]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
+          </svg>
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#1C1E21] text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Visit our Google Business
           </span>
         </a>
 
@@ -308,14 +393,17 @@ export default function ProductCarousel() {
                       {product.description}
                     </p>
                     
-                    {/* Price and Weight */}
-                    {(product.price || product.weight) && (
+                    {/* Price, Weight, and Dimensions */}
+                    {(product.price || product.weight || product.dimensions) && (
                       <div className="flex items-center justify-center gap-4 text-base">
                         {product.price && (
                           <span className="font-bold text-[#1C1E21] text-xl">₹{product.price}</span>
                         )}
                         {product.weight && (
                           <span className="text-black font-semibold">Weight: {product.weight}</span>
+                        )}
+                        {product.dimensions && (
+                          <span className="text-black font-semibold">Size: {product.dimensions}</span>
                         )}
                       </div>
                     )}
@@ -326,11 +414,15 @@ export default function ProductCarousel() {
                     <motion.button
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
+                      transition={{ duration: 0.3 }}
                       onClick={handleAddToCart}
-                      className="absolute bottom-4 right-4 px-6 py-3 bg-[#1C1E21] text-white text-sm font-medium rounded-lg hover:bg-black transition-all shadow-md hover:shadow-lg"
+                      className={`absolute bottom-4 right-4 px-6 py-3 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-lg ${
+                        isAddingToCart 
+                          ? 'bg-green-600 hover:bg-green-700' 
+                          : 'bg-[#1C1E21] hover:bg-black'
+                      }`}
                     >
-                      Add to Cart
+                      {isAddingToCart ? '✓ Added!' : 'Add to Cart'}
                     </motion.button>
                   )}
                 </div>
@@ -474,7 +566,7 @@ export default function ProductCarousel() {
             <div className="p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-[#1C1E21]">Cart {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}</h2>
+                <h2 className="text-2xl font-bold text-[#1C1E21]">Cart {cartCount} {cartCount === 1 ? 'item' : 'items'}</h2>
                 <button 
                   onClick={() => setIsCartOpen(false)}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -502,17 +594,31 @@ export default function ProductCarousel() {
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold text-sm text-[#1C1E21]">{item.title}</h4>
+                          <p className="text-xs text-gray-600 mt-1">₹{item.price} each</p>
                         </div>
-                        <span className="font-bold text-[#1C1E21]">₹{item.price}</span>
-                        <button
-                          onClick={() => handleRemoveFromCart(idx)}
-                          className="ml-2 p-1 hover:bg-red-100 rounded-full transition-colors"
-                          title="Remove item"
-                        >
-                          <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+                        
+                        {/* Quantity Controls */}
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleDecreaseQuantity(idx)}
+                            className="w-7 h-7 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
+                            title="Decrease quantity"
+                          >
+                            <svg className="w-4 h-4 text-[#1C1E21]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <span className="font-bold text-[#1C1E21] min-w-[20px] text-center">{item.quantity}</span>
+                          <button
+                            onClick={() => handleIncreaseQuantity(idx)}
+                            className="w-7 h-7 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
+                            title="Increase quantity"
+                          >
+                            <svg className="w-4 h-4 text-[#1C1E21]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -553,43 +659,92 @@ export default function ProductCarousel() {
                       <div className="flex gap-3 w-full">
                         <input
                           type="text"
-                          placeholder="Full Name"
+                          placeholder="Full Name *"
                           value={customerInfo.name}
-                          onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
+                          onChange={(e) => {
+                            const value = e.target.value.slice(0, 50);
+                            setCustomerInfo({...customerInfo, name: value});
+                          }}
+                          required
+                          maxLength={50}
                           className="flex-1 min-w-0 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 text-[#1C1E21] placeholder:text-gray-500 font-medium"
                         />
                         <input
                           type="tel"
-                          placeholder="Phone"
+                          placeholder="Phone *"
                           value={customerInfo.phone}
-                          onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
+                          onChange={(e) => {
+                            let value = e.target.value;
+                            // Ensure +91 space prefix
+                            if (!value.startsWith('+91 ')) {
+                              value = '+91 ';
+                            }
+                            // Only allow numbers after +91 space
+                            const numbers = value.slice(4).replace(/\D/g, '').slice(0, 10);
+                            setCustomerInfo({...customerInfo, phone: '+91 ' + numbers});
+                          }}
+                          required
+                          pattern="\+91 [0-9]{10}"
                           className="flex-1 min-w-0 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 text-[#1C1E21] placeholder:text-gray-500 font-medium"
                         />
                       </div>
                       <input
                         type="email"
-                        placeholder="Email Address"
+                        placeholder="Email Address *"
                         value={customerInfo.email}
-                        onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
+                        onChange={(e) => {
+                          const value = e.target.value.slice(0, 100);
+                          setCustomerInfo({...customerInfo, email: value});
+                        }}
+                        required
+                        maxLength={100}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 text-[#1C1E21] placeholder:text-gray-500 font-medium"
                       />
                       <textarea
-                        placeholder="Delivery Address"
+                        placeholder="Delivery Address *"
                         value={customerInfo.address}
-                        onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
+                        onChange={(e) => {
+                          const value = e.target.value.slice(0, 500);
+                          setCustomerInfo({...customerInfo, address: value});
+                        }}
+                        required
+                        maxLength={500}
                         rows={3}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] bg-white/70 resize-none text-[#1C1E21] placeholder:text-gray-500 font-medium"
                       />
                     </div>
                   </div>
 
-                  {/* Payment Button */}
+                  {/* WhatsApp Order Button */}
                   <button 
-                    onClick={() => alert('Payment processing...')}
-                    disabled={!customerInfo.name || !customerInfo.email || !customerInfo.phone || !customerInfo.address}
-                    className="w-full py-3 bg-[#1C1E21] text-white font-semibold rounded-lg hover:bg-black transition-all shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
+                    onClick={() => {
+                      const total = calculateTotal();
+                      const itemsList = cartItems.map((item, idx) => 
+                        `${idx + 1}. ${item.title} - Qty: ${item.quantity} - ₹${(item.price || 0) * item.quantity}`
+                      ).join('%0A');
+                      
+                      const message = `*New Order from Website*%0A%0A` +
+                        `*Customer Details:*%0A` +
+                        `Name: ${customerInfo.name}%0A` +
+                        `Phone: ${customerInfo.phone}%0A` +
+                        `Email: ${customerInfo.email}%0A` +
+                        `Address: ${customerInfo.address}%0A%0A` +
+                        `*Order Items:*%0A${itemsList}%0A%0A` +
+                        `*Order Summary:*%0A` +
+                        `Subtotal: ₹${total.subtotal}%0A` +
+                        `Delivery: ₹${total.deliveryCharge}%0A` +
+                        (total.discountPercent > 0 ? `Discount (${total.discountPercent}%): -₹${total.discount}%0A` : '') +
+                        `*Total: ₹${total.total}*`;
+                      
+                      window.open(`https://wa.me/message/6G7MZ6EIVUZ6B1?text=${message}`, '_blank');
+                    }}
+                    disabled={!customerInfo.name || !customerInfo.email || customerInfo.phone.length !== 14 || !customerInfo.address}
+                    className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400 flex items-center justify-center gap-2"
                   >
-                    Proceed to Payment
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    Place Order on WhatsApp
                   </button>
                 </>
               )}
