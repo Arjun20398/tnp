@@ -23,6 +23,8 @@ export default function ProductCarousel() {
   const [isDragging, setIsDragging] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -140,16 +142,21 @@ export default function ProductCarousel() {
   };
 
   // Auto-rotate carousel - DISABLED
-  // useEffect(() => {
-  //   if (!isAutoRotating) return;
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+      setIsTablet(window.innerWidth >= 640 && window.innerWidth < 768);
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  //   const interval = setInterval(() => {
-  //     setCurrentIndex((prev) => (prev === products.length - 1 ? 0 : prev + 1));
-  //     setRotation(prev => prev - anglePerSide);
-  //   }, 3000); // Rotate every 3 seconds
-
-  //   return () => clearInterval(interval);
-  // }, [isAutoRotating, anglePerSide]);
+  useEffect(() => {
+    if (!isAutoRotating) return;
+    // Auto-rotation disabled
+  }, [isAutoRotating]);
 
   // Get circular index (wraps around)
   const getCircularIndex = (index: number) => {
@@ -176,8 +183,6 @@ export default function ProductCarousel() {
     
     // Left card (position = -1)
     if (position === -1) {
-      const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-      const isTablet = typeof window !== 'undefined' && window.innerWidth >= 640 && window.innerWidth < 768;
       return {
         scale: isMobile ? 0.5 : 0.7,
         opacity: isMobile ? 0.3 : 0.6,
@@ -190,8 +195,6 @@ export default function ProductCarousel() {
     
     // Right card (position = 1)
     if (position === 1) {
-      const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-      const isTablet = typeof window !== 'undefined' && window.innerWidth >= 640 && window.innerWidth < 768;
       return {
         scale: isMobile ? 0.5 : 0.7,
         opacity: isMobile ? 0.3 : 0.6,
@@ -355,8 +358,8 @@ export default function ProductCarousel() {
                   transformStyle: 'preserve-3d',
                   left: '50%',
                   top: '50%',
-                  marginLeft: window.innerWidth < 640 ? '-150px' : window.innerWidth < 768 ? '-250px' : '-385px',
-                  marginTop: window.innerWidth < 640 ? '-200px' : window.innerWidth < 768 ? '-210px' : '-220px',
+                  marginLeft: isMobile ? '-150px' : isTablet ? '-250px' : '-385px',
+                  marginTop: isMobile ? '-200px' : isTablet ? '-210px' : '-220px',
                   zIndex: position === 0 ? 10 : Math.max(0, 5 - absDiff),
                   pointerEvents: absDiff > 1 ? 'none' : 'auto'
                 }}
