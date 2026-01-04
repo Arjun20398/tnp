@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import ProductCarousel from '@/components/ProductCarousel';
+import ShootingStars from '@/components/ShootingStars';
 
 // Dynamically import 3D scene to avoid SSR issues
 const Scene3D = dynamic(() => import('@/components/Scene3D'), {
@@ -13,6 +14,7 @@ export default function Home() {
   return (
     <main className="relative min-h-screen">
       <Scene3D />
+      <ShootingStars />
       <div className="relative z-10">
         <ProductCarousel />
       </div>

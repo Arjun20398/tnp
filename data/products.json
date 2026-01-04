@@ -3,7 +3,7 @@
     "id": 1,
     "title": "MARVEL Logo Desk Decor",
     "description": "A bold MARVEL logo desk showpiece crafted for true superhero fans. Made from premium acrylic with a glossy red finish, this piece instantly stands out on work desks, gaming setups, or shelves. Its clean-cut design and sturdy base make it perfect for daily display without taking up much space. A must-have collectible for Marvel lovers and an excellent gift for birthdays, desks, or office décor.",
-    "images": ["/assets/marvel_logo_0.png", "/assets/marvel_logo_0.png", "/assets/marvel_logo_0.png"],
+    "images": ["/assets/marvel_logo_0.png", "/assets/marvel_logo_1.png", "/assets/marvel_logo_2.png"],
     "price": 300,
     "weight": "40g",
     "dimensions": "12 x 6 cm"
@@ -12,7 +12,7 @@
     "id": 2,
     "title": "Avengers \"A\" Logo Desk Showpiece",
     "description": "Bring together Earth's mightiest style with this Avengers \"A\" logo desk decor. Precision-cut in matte black acrylic, this minimalist yet powerful design fits perfectly into modern tech and coding workspaces. The solid base ensures stability while the sharp silhouette gives it a premium collectible feel. Ideal for fans who love subtle but strong superhero aesthetics.",
-    "images": ["/assets/avengers_logo_0.png", "/assets/avengers_logo_0.png", "/assets/avengers_logo_0.png"],
+    "images": ["/assets/avengers_logo_0.png", "/assets/avengers_logo_1.png", "/assets/avengers_logo_2.png"],
     "price": 150,
     "weight": "15g",
     "dimensions": "5 x 5 cm"
@@ -21,7 +21,7 @@
     "id": 3,
     "title": "Batman Dark Knight (Wide Wing)",
     "description": "A sleek Batman bat-symbol desk piece inspired by the Dark Knight's iconic emblem. Crafted in matte black acrylic with a wide-wing design, this decor adds a dramatic yet elegant touch to any setup. Perfect for fans who appreciate dark, minimalist superhero aesthetics. Looks great on desks, shelves, or gaming stations.",
-    "images": ["/assets/batman_v1_0.png", "/assets/batman_v1_0.png", "/assets/batman_v1_0.png"],
+    "images": ["/assets/batman_v1_0.png", "/assets/batman_v1_1.png", "/assets/batman_v1_2.png"],
     "price": 200,
     "weight": "20g",
     "dimensions": "10 x 5 cm"
@@ -30,7 +30,7 @@
     "id": 4,
     "title": "Batman Bat-Symbol Desk Decor",
     "description": "This compact Batman bat-symbol showpiece delivers the same iconic presence in a slightly tighter form. Made from high-quality matte black acrylic, it's designed for smaller desks while still making a bold statement. A great collectible for Batman fans who want subtle fandom without clutter.",
-    "images": ["/assets/batman_v2_0.png", "/assets/batman_v2_0.png", "/assets/batman_v2_0.png"],
+    "images": ["/assets/batman_v2_0.png", "/assets/batman_v2_1.png", "/assets/batman_v2_2.png"],
     "price": 200,
     "weight": "18g",
     "dimensions": "10 x 5 cm"
@@ -39,7 +39,7 @@
     "id": 5,
     "title": "Punisher Skull Desk Decor",
     "description": "A striking Punisher skull desk decor designed for fans who love bold, intense superhero aesthetics. Laser-cut from matte black acrylic, this piece features sharp detailing and a strong presence. Perfect for gaming desks, workstations, or shelves, it makes a powerful statement without being flashy.",
-    "images": ["/assets/punisher_0.png", "/assets/punisher_0.png", "/assets/punisher_0.png"],
+    "images": ["/assets/punisher_1.png", "/assets/punisher_0.png", "/assets/punisher_2.png"],
     "price": 200,
     "weight": "20g",
     "dimensions": "4 x 6 cm"
@@ -48,9 +48,18 @@
     "id": 6,
     "title": "Chrome Dino Desk Decor",
     "description": "Bring the iconic Chrome offline dinosaur to your desk! This playful desk decor is perfect for developers, gamers, and anyone who appreciates internet culture. Crafted from premium acrylic, it adds a fun, nostalgic touch to any workspace.",
-    "images": ["/assets/chrome_dino_0.png", "/assets/chrome_dino_0.png", "/assets/chrome_dino_0.png"],
+    "images": ["/assets/chrome_dino_0.png", "/assets/chrome_dino_1.png", "/assets/chrome_dino_2.png"],
     "price": 250,
     "weight": "20g",
     "dimensions": "10 x 5 cm"
+  },
+  {
+    "id": 7,
+    "title": "Black Panther Desk Decor",
+    "description": "Wakanda Forever! This striking Black Panther desk showpiece captures the iconic superhero in sleek matte black acrylic. Perfect for Marvel fans and collectors, this piece brings the power and elegance of the Black Panther to your workspace. Its compact design fits perfectly on desks, shelves, or display cases.",
+    "images": ["/assets/black_panther_0.png", "/assets/black_panther_1.png", "/assets/black_panther_2.png"],
+    "price": 200,
+    "weight": "22g",
+    "dimensions": "5 x 8 cm"
   }
 ]

@@ -170,8 +170,17 @@ export default function ProductCarousel() {
   };
 
   const getItemStyle = (index: number) => {
-    // Calculate position relative to current index
-    const position = index - currentIndex;
+    // Calculate position relative to current index with circular wrapping
+    let position = index - currentIndex;
+    const totalProducts = products.length;
+    
+    // Handle circular wrapping
+    if (position > totalProducts / 2) {
+      position -= totalProducts;
+    } else if (position < -totalProducts / 2) {
+      position += totalProducts;
+    }
+    
     const absDiff = Math.abs(position);
     
     // Center card
@@ -306,10 +315,13 @@ export default function ProductCarousel() {
         </a>
 
         {/* Email */}
-        <a href={siteConfig.social.email} className="p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all border border-[#D1D5DB] hover:bg-gray-50">
+        <a href={siteConfig.social.email} className="p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all border border-[#D1D5DB] hover:bg-gray-50 group relative">
           <svg className="w-6 h-6 text-[#1C1E21]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#1C1E21] text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Email Us At
+          </span>
         </a>
 
         {/* Built By - LinkedIn */}
@@ -329,7 +341,16 @@ export default function ProductCarousel() {
           {/* Render all products on the cylinder */}
           {products.map((product, index) => {
             const style = getItemStyle(index);
-            const position = index - currentIndex;
+            let position = index - currentIndex;
+            
+            // Handle circular wrapping
+            const totalProducts = products.length;
+            if (position > totalProducts / 2) {
+              position -= totalProducts;
+            } else if (position < -totalProducts / 2) {
+              position += totalProducts;
+            }
+            
             const absDiff = Math.abs(position);
             
             // Only render visible cards (center and 1 on each side)
@@ -369,7 +390,7 @@ export default function ProductCarousel() {
                   pointerEvents: absDiff > 1 ? 'none' : 'auto'
                 }}
               >
-                <div className="w-[300px] h-[440px] sm:w-[500px] sm:h-[462px] md:w-[770px] md:h-[484px] rounded-2xl bg-white/70 backdrop-blur-md border border-[#D1D5DB] p-4 sm:p-6 md:p-8 flex flex-col md:flex-row gap-4 sm:gap-6 shadow-2xl relative">
+                <div className="w-[300px] h-[440px] sm:w-[500px] sm:h-[462px] md:w-[770px] md:h-[484px] rounded-2xl bg-white/80 backdrop-blur-md border border-[#D1D5DB] p-4 sm:p-6 md:p-8 flex flex-col md:flex-row gap-4 sm:gap-6 shadow-2xl relative">
                   {/* Left Side - Product Image */}
                   <div 
                     className="flex-shrink-0 w-full md:w-[320px] h-[180px] sm:h-[200px] md:h-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity bg-white/50 rounded-xl overflow-hidden"
@@ -500,16 +521,16 @@ export default function ProductCarousel() {
       {/* Image Modal */}
       {selectedProduct && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
           onClick={closeImageModal}
         >
           <div 
-            className="relative max-w-sm sm:max-w-2xl md:max-w-4xl w-full mx-2 sm:mx-4"
+            className="relative max-w-[280px] sm:max-w-[400px] md:max-w-[500px] w-full mx-2 sm:mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Main Image */}
-            <div className="bg-white/10 rounded-lg p-2 sm:p-4 relative">
-              <div className="relative h-[300px] sm:h-[450px] md:h-[600px] flex items-center justify-center">
+            <div className="bg-white/30 rounded-lg p-2 sm:p-4 relative">
+              <div className="relative h-[400px] sm:h-[550px] md:h-[700px] flex items-center justify-center">
                 {selectedProduct.images[currentImageIndex].startsWith('/') || selectedProduct.images[currentImageIndex].startsWith('http') ? (
                   <img 
                     src={selectedProduct.images[currentImageIndex]} 
@@ -570,11 +591,6 @@ export default function ProductCarousel() {
                   ))}
                 </div>
               )}
-
-              {/* Image Counter */}
-              <div className="mt-2 text-center text-sm text-[#5F6368]">
-                {currentImageIndex + 1} / {selectedProduct.images.length}
-              </div>
             </div>
           </div>
         </div>
