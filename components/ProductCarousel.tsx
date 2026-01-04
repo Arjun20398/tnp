@@ -293,7 +293,7 @@ export default function ProductCarousel() {
       </div>
 
       {/* Social Media Icons - Bottom */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-6">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-6">
         {/* Instagram */}
         <a href={siteConfig.social.instagram} target="_blank" rel="noopener noreferrer" className="p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all border border-[#D1D5DB] hover:bg-gray-50 group relative">
           <svg className="w-6 h-6 text-[#1C1E21]" fill="currentColor" viewBox="0 0 24 24">
@@ -385,12 +385,12 @@ export default function ProductCarousel() {
                   left: '50%',
                   top: '50%',
                   marginLeft: isMobile ? '-150px' : isTablet ? '-250px' : '-385px',
-                  marginTop: isMobile ? '-200px' : isTablet ? '-210px' : '-220px',
+                  marginTop: isMobile ? '-280px' : isTablet ? '-270px' : '-260px',
                   zIndex: position === 0 ? 10 : Math.max(0, 5 - absDiff),
                   pointerEvents: absDiff > 1 ? 'none' : 'auto'
                 }}
               >
-                <div className="w-[300px] h-[440px] sm:w-[500px] sm:h-[462px] md:w-[770px] md:h-[484px] rounded-2xl bg-white/80 backdrop-blur-md border border-[#D1D5DB] p-4 sm:p-6 md:p-8 flex flex-col md:flex-row gap-4 sm:gap-6 shadow-2xl relative">
+                <div className="w-[300px] h-[560px] sm:w-[500px] sm:h-[540px] md:w-[770px] md:h-[520px] rounded-2xl bg-white/80 backdrop-blur-md border border-[#D1D5DB] p-4 sm:p-6 md:p-8 flex flex-col md:flex-row gap-4 sm:gap-6 shadow-2xl relative">
                   {/* Left Side - Product Image */}
                   <div 
                     className="flex-shrink-0 w-full md:w-[320px] h-[180px] sm:h-[200px] md:h-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity bg-white/50 rounded-xl overflow-hidden"

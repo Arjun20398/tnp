@@ -60,7 +60,7 @@ export default function ShootingStars() {
         __html: `
           @keyframes shootingStar {
             0% {
-              transform: rotate(-45deg) translateX(0);
+              transform: rotate(45deg) translateX(0);
               opacity: 0;
             }
             10% {
@@ -70,7 +70,7 @@ export default function ShootingStars() {
               opacity: 1;
             }
             100% {
-              transform: rotate(-45deg) translateX(400px);
+              transform: rotate(45deg) translateX(400px);
               opacity: 0;
             }
           }
