@@ -36,7 +36,7 @@ export default function ShootingStars() {
           left: Math.random() * 100,
           top: Math.random() * 60, // Spread across more of the screen
           delay: 0, // No delay
-          duration: 1.5 + Math.random() * 1, // 1.5-2.5s
+          duration: 3 + Math.random() * 2, // 3-5s (50% slower)
           size: 0.4 + Math.random() * 0.35, // Varied sizes (50% of original)
           color: colors[Math.floor(Math.random() * colors.length)],
         });
