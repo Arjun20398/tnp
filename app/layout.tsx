@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tech Superhero - Next Gen Gadgets",
-  description: "Experience the future of technology with stunning 3D animations",
+  title: "The Noble Presents",
+  description: "Experience the unique style of gifting",
+  icons: {
+    icon: '/favicon-32x32.png',
+  },
 };
 
 export default function RootLayout({
